@@ -1,6 +1,8 @@
 from typing import Any
 import httpx
 from mcp.server.fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import Response, JSONResponse
 
 # Initialize FastMCP server
 mcp = FastMCP("weather", host="0.0.0.0", port=8000)
@@ -12,10 +14,7 @@ USER_AGENT = "weather-app/1.0"
 
 async def make_nws_request(url: str) -> dict[str, Any] | None:
     """Make a request to the NWS API with proper error handling."""
-    headers = {
-        "User-Agent": USER_AGENT,
-        "Accept": "application/geo+json"
-    }
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/geo+json"}
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(url, headers=headers, timeout=30.0)
@@ -24,17 +23,17 @@ async def make_nws_request(url: str) -> dict[str, Any] | None:
         except Exception:
             return None
 
+
 def format_alert(feature: dict) -> str:
     """Format an alert feature into a readable string."""
     props = feature["properties"]
     return f"""
-Event: {props.get('event', 'Unknown')}
-Area: {props.get('areaDesc', 'Unknown')}
-Severity: {props.get('severity', 'Unknown')}
-Description: {props.get('description', 'No description available')}
-Instructions: {props.get('instruction', 'No specific instructions provided')}
+Event: {props.get("event", "Unknown")}
+Area: {props.get("areaDesc", "Unknown")}
+Severity: {props.get("severity", "Unknown")}
+Description: {props.get("description", "No description available")}
+Instructions: {props.get("instruction", "No specific instructions provided")}
 """
-
 
 
 @mcp.tool()
@@ -55,6 +54,7 @@ async def get_alerts(state: str) -> str:
 
     alerts = [format_alert(feature) for feature in data["features"]]
     return "\n---\n".join(alerts)
+
 
 @mcp.tool()
 async def get_forecast(latitude: float, longitude: float) -> str:
@@ -83,20 +83,21 @@ async def get_forecast(latitude: float, longitude: float) -> str:
     forecasts = []
     for period in periods[:5]:  # Only show next 5 periods
         forecast = f"""
-{period['name']}:
-Temperature: {period['temperature']}°{period['temperatureUnit']}
-Wind: {period['windSpeed']} {period['windDirection']}
-Forecast: {period['detailedForecast']}
+{period["name"]}:
+Temperature: {period["temperature"]}°{period["temperatureUnit"]}
+Wind: {period["windSpeed"]} {period["windDirection"]}
+Forecast: {period["detailedForecast"]}
 """
         forecasts.append(forecast)
 
     return "\n---\n".join(forecasts)
 
 
-
-
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> Response:
+    return JSONResponse({"status": "ok"})
 
 
 if __name__ == "__main__":
     # Initialize and run the server
-    mcp.run(transport='streamable-http')
+    mcp.run(transport="streamable-http")
