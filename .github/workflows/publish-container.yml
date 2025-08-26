@@ -18,9 +18,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - run: docker build -t weather-mcp .
+      - run: docker build -t ${{ env.IMAGE_NAME }} .
 
-      - run: docker run -p 8000:8000 --name weather-mcp -d weather-mcp
+      - run: docker run -p 8000:8000 --name weather-mcp -d ${{ env.IMAGE_NAME }}
         timeout-minutes: 3
 
       - name: Run the health check validation
