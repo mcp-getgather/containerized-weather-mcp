@@ -16,6 +16,7 @@ For convenience, we have deployed the container using fly.io at https://getgathe
     }
   }
 }
+```
 
 Clients such as VS Code and Cursor offer true streamable http support (as well as MCP inspector), so there's no need for `npx` or `mcp-remote` commands. 
 
