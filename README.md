@@ -6,7 +6,20 @@ A containerized version of the weather mcp at https://modelcontextprotocol.io/qu
 
 ### Connecting Your MCP Client to a Deployed Instance
 
-For convenience, we have deployed the container using fly.io at https://getgather-weather.fly.dev/mcp. If you so desire, you can connect your MCP client directly to this instance. For example, in Claude Desktop, you can add the following to your `claude_desktop_config.json`:
+For convenience, we have deployed the container using fly.io at https://getgather-weather.fly.dev/mcp. If you so desire, you can connect your MCP client directly to this instance. For example, in Cursor/VS Code you can add the following to your `mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "weather": {
+      "url": "https://getgather-weather.fly.dev/mcp"
+    }
+  }
+}
+
+Clients such as VS Code and Cursor offer true streamable http support (as well as MCP inspector), so there's no need for `npx` or `mcp-remote` commands. 
+
+If you want to test with Claude, it isn't truly using streamable http as the transport, as Claude Desktop doesn't support that yet, but it works fine for testing (claude launches a proxy that hits your endpoint). For example, in Claude Desktop, you can add the following to your `claude_desktop_config.json`:
 
 ```json
 {
@@ -46,6 +59,6 @@ Then add http://localhost:8000/mcp as a model endpoint in your MCP client. If us
 }
 ```
 
-This isn't truly using streamable http as the transport, as Claude Desktop doesn't support that yet, but it works fine for testing (claude launches a proxy that hits your endpoint). If you want true streamable http support, you can use either inspector, Claude Code, or another MCP client that supports streamable http.
+If you're not using Claude, and you're client supports http streaming directly, you will just need the local URL and `/mcp` extension as in the VS Code/Cursor example above.
 
 Remember for streamable http (including mcp-remote), you need your mcp server to be running [(as opposed to the client launching it for you as with stdio)](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#stdio).
