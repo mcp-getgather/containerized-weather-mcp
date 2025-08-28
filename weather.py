@@ -5,7 +5,7 @@ from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 
 # Initialize FastMCP server
-mcp = FastMCP("weather", host="0.0.0.0", port=8000, streamable_http_path="/mcp-weather")
+mcp = FastMCP("weather", host="0.0.0.0", port=8000, streamable_http_path="/mcp")
 
 # Constants
 NWS_API_BASE = "https://api.weather.gov"

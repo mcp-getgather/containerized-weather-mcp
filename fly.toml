@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for containerized-weather-mcp on 2025-08-27T16:14:55-07:00
+# fly.toml app configuration file generated for getgather-weather on 2025-08-28T13:52:15-06:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'containerized-weather-mcp'
+app = 'getgather-weather'
 primary_region = 'sjc'
 
 [build]
