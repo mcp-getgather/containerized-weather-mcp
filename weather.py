@@ -2,7 +2,7 @@ from typing import Any
 import httpx
 from mcp.server.fastmcp import FastMCP
 from starlette.requests import Request
-from starlette.responses import Response, JSONResponse
+from starlette.responses import Response, JSONResponse, RedirectResponse
 
 # Initialize FastMCP server
 mcp = FastMCP("weather", host="0.0.0.0", port=8000, streamable_http_path="/mcp")
@@ -91,6 +91,14 @@ Forecast: {period["detailedForecast"]}
         forecasts.append(forecast)
 
     return "\n---\n".join(forecasts)
+
+
+@mcp.custom_route("/", methods=["GET"])
+async def redirect_to_github(request: Request) -> Response:
+    return RedirectResponse(
+        url="https://github.com/mcp-getgather/containerized-weather-mcp",
+        status_code=301,
+    )
 
 
 @mcp.custom_route("/health", methods=["GET"])
