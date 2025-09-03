@@ -1,16 +1,10 @@
 # containerized-weather-mcp
 
-A containerized version of the weather mcp at https://modelcontextprotocol.io/quickstart/server
+This is [the weather server](https://modelcontextprotocol.io/quickstart/server) from the official [MCP documentation](https://modelcontextprotocol.io/docs/), packaged in a container. It only works with MCP clients that support [streamable HTTP transport](https://modelcontextprotocol.io/docs/learn/architecture#transport-layer).
 
 ## Quickstart
 
-### Connecting Your MCP Client to a Deployed Instance
-
-For convenience, we have deployed the container using fly.io at https://getgather-weather.fly.dev/mcp. 
-
-If you so desire, you can connect your MCP client directly to this instance. Clients like Claude offer an option to add custom connectors directly from the settings. Open Claude, navigate to settings, and go to the "Connectors" tab. Click on "Add custom connector" and give your connector a name. Then, in the second box for "Remore MCP server URL" you can paste `https://getgather-weather.fly.dev/mcp`. Finish by clicking "Add" (no advanced settings necessary for this!). You should see the new weather MCP appear in your list of connectors. Open a new chat in Claude and look for the server under the "Tools" icon. You should see it appear under the name you set for it.
-
-For clients that don't use custom connectors in the UI, you can always set up the weather MCP using a simple URL in the configuration JSON. For example, in Cursor/VS Code you can add the following to your `mcp.json`:
+For [VS Code](https://code.visualstudio.com/docs/copilot/customization/mcp-servers), [Cursor](https://docs.cursor.com/en/context/mcp), [LM Studio](https://lmstudio.ai/docs/app/plugins/mcp), [Jan](https://docs.jan.ai/jan/mcp/), and similar apps, add the following to the MCP servers configuration, typically called `mcp.json`:
 
 ```json
 {
@@ -22,29 +16,33 @@ For clients that don't use custom connectors in the UI, you can always set up th
 }
 ```
 
-### Run Locally with Docker
+For [Claude](https://claude.ai/), use its [custom connectors feature](https://support.anthropic.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp):
 
-Alternatively, you can build the Docker image locally and add the running endpoint to your client config. The following command pulls and runs the latest public image for the weather MCP.
+1. Open Claude, navigate to _Settings_, and go to the _Connectors_ tab.
+2. Click _Add custom connector_ and give the connector a name.
+3. In the second box for _Remote MCP server URL_, paste `https://getgather-weather.fly.dev/mcp`.
+4. Click _Add_ to finish (no advanced settings necessary for this server).
 
-`$ docker run -p 8000:8000 ghcr.io/mcp-getgather/containerized-weather-mcp`
+The new weather MCP server will appear in the list of connectors. Open a new chat in Claude and look for the server under the _Tools_ icon.
 
-Then add http://localhost:8000/mcp as a model endpoint in your MCP client. If using Claude Desktop, you can add the following to your `claude_desktop_config.json` (which is found from `Claude` -> `Settings` -> `Developer` -> `Edit Config`):
+### Run Locally
+
+Use [Docker](https://docker.com) or [Podman](https://podman.io) to pull the container image and run it:
+
+```bash
+docker run -p 8000:8000 ghcr.io/mcp-getgather/containerized-weather-mcp
+```
+
+Then use `http://localhost:8000/mcp` as the remote URL in the MCP server configuration `mcp.json` (works for [VS Code](https://code.visualstudio.com/docs/copilot/customization/mcp-servers), [Cursor](https://docs.cursor.com/en/context/mcp), [LM Studio](https://lmstudio.ai/docs/app/plugins/mcp), [Jan](https://docs.jan.ai/jan/mcp/), etc.):
 
 ```json
 {
   "mcpServers": {
-    "http-weather": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://127.0.0.1:8000/mcp",
-        "--allow-http"
-      ]
+    "weather": {
+      "url": "http://localhost:8000/mcp"
     }
   }
 }
 ```
 
-If you're not using Claude, and you're client supports http streaming directly, you will just need the local URL and `/mcp` extension as in the VS Code/Cursor example above.
-
-Remember for streamable http (including mcp-remote), you need your mcp server to be running [(as opposed to the client launching it for you as with stdio)](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#stdio).
+For [Claude](https://claude.ai/), note that its [custom connectors feature](https://support.anthropic.com/en/articles/11175166-getting-started-with-custom-connectors-using-remote-mcp) only supports HTTPS, not HTTP. To use the local server with Claude, set up a reverse tunnel to make this local server accessible over a secure connection.
