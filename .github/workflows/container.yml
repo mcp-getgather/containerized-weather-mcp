@@ -6,6 +6,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: ${{ github.event.repository.name }}
 jobs:
   container:
     runs-on: ubuntu-22.04
@@ -15,9 +17,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - run: docker build -t weather-mcp .
+      - run: docker build -t ${{ env.IMAGE_NAME }} .
 
-      - run: docker run -p 8000:8000 --name weather-mcp -d weather-mcp
+      - run: docker run -p 8000:8000 --name ${{ env.IMAGE_NAME }} -d ${{ env.IMAGE_NAME }}
         timeout-minutes: 3
 
       - name: Run the health check validation
@@ -25,5 +27,5 @@ jobs:
         timeout-minutes: 3
 
       - name: Get the container logs
-        run: docker logs --details weather-mcp
+        run: docker logs --details ${{ env.IMAGE_NAME }}
         if: always()
