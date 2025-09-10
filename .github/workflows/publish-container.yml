@@ -68,7 +68,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.PUBLISH_NAME }}:${{ github.sha }}
           labels: |
             org.opencontainers.image.description=A containerized weather MCP server calling the National Weather Service API.
-            org.opencontainers.image.source=https://github.com/${{ PUBLISH_NAME }}
+            org.opencontainers.image.source=https://github.com/${{ env.PUBLISH_NAME }}
             org.opencontainers.image.licenses=MIT
 
   test-published-container:
