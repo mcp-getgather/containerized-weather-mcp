@@ -7,7 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.event.repository.name }}
+  PUBLISH_NAME: ${{ github.repository }}
 
 jobs:
   test-local-container:
@@ -63,11 +64,11 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.PUBLISH_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.PUBLISH_NAME }}:${{ github.sha }}
           labels: |
             org.opencontainers.image.description=A containerized weather MCP server calling the National Weather Service API.
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.source=https://github.com/${{ env.PUBLISH_NAME }}
             org.opencontainers.image.licenses=MIT
 
   test-published-container:
@@ -77,10 +78,10 @@ jobs:
 
     steps:
       - name: Pull specific image
-        run: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: docker pull ${{ env.REGISTRY }}/${{ env.PUBLISH_NAME }}:${{ github.sha }}
 
       - name: Run the container
-        run: docker run -d --rm --name ${{ env.IMAGE_NAME }} -p 8000:8000 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: docker run -d --rm --name ${{ env.IMAGE_NAME }} -p 8000:8000 ${{ env.REGISTRY }}/${{ env.PUBLISH_NAME }}:${{ github.sha }}
 
       - name: Run the health check validation
         run: while ! curl -s 'http://localhost:8000/health' | grep '"status":"ok"'; do sleep 1; done
